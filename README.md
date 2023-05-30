@@ -12,5 +12,7 @@
  
  
  
- Update `trans_section` table current_state depend on above status 
- Insert into `trans_application` table 	application_id , assing to , comments
+ -Update `trans_section` table current_state depend on above status 
+ 
+ 
+ -Insert into `trans_application` table 	application_id , assing to , comments
