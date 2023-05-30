@@ -1,0 +1,149 @@
+<?php session_start();
+include_once('includes/config.php');
+if (strlen($_SESSION['id'] == 0)) {
+  header('location:logout.php');
+} else {
+
+  include_once("head.php");
+  $section=$_SESSION['id'];
+  $user_type=$_SESSION['user_type'];
+  if ($_SESSION['id']==1) {
+    $sql = "SELECT application_id,subject,section_id,ref_date,reference_no FROM trans_section";
+  }
+  else {
+    $sql = "SELECT application_id,subject,section_id,ref_date,reference_no FROM trans_section where section_id=$section and current_state=$user_type";
+    if ($user_type==1){
+        $sql_user = "SELECT * FROM `trans_user` where `pcId` =$section and user_type=2";
+        $ret_user= mysqli_query($con,$sql_user);
+    }
+} 
+    $ret1= mysqli_query($con,$sql);
+
+    /// Submit Filed test value 
+if(isset($_POST['send_app'])){
+    
+    $sec_user=$_POST['section_user'];
+    $application_no = $_POST['application'];
+    $comments=$_POST['comments'];
+    $sqll="UPDATE `trans_section` SET `current_state` = $sec_user WHERE `application_id` = $application_no";
+    if (mysqli_query($con, $sqll)) {
+    $sql="INSERT INTO `trans_application`(`application_id`, `send_to`, `comments`) VALUES ('$application_no','$sec_user','$comments')";  
+    $msg=mysqli_query($con,$sql);
+    if($msg)
+     {
+      echo "<script>alert('User Added successfully');</script>";
+         echo "<script type='text/javascript'> document.location = 'add_user.php'; </script>";
+      }
+    }else{
+        echo "<script>alert('Error updating record');</script>";
+
+    }
+
+}
+    
+?>
+
+            <!-- MAIN CONTENT-->
+            <div class="main-content">
+                <div class="section__content section__content--p30">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <!-- DATA TABLE -->
+                                <h3 class="title-5 m-b-35">Table</h3>
+                                <div class="table-data__tool">
+                                <form class="form-sample" method="post">
+                                <div class="table-responsive table-responsive-data2">
+                                    <table class="table table-data2">
+                                        <thead>
+                                            <tr>
+                                                <th>Reference ID</th>
+                                                <th>Application No</th>
+                                                <th>Dated</th>
+                                                <th>Subject</th>
+                                                <th>Period</th>
+                                                <th>Comments</th>
+                                                <?php
+                                                if (  $user_type==1){
+                                                echo "<th> Assign to <th>";
+                                                }?>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        <form action="" method="post">
+                                        <?php 
+                                                while ($ftd = mysqli_fetch_array($ret1)) {
+                                                echo "<tr class='tr-shadow'>";
+                                                echo "<td>".$ftd['reference_no']."</td>"; 
+                                                    echo "<td>".$ftd['application_id']."</td>";
+                                                    echo "<td>".$ftd['ref_date']."</td>";  
+                                                    echo "<td  class='status--process'>".$ftd['subject']."</td>";  
+                                                    echo "<td>Hello</td>"; ?>
+                                                    
+                                                    <?php
+                                                    if (  $user_type==1){
+                                                        
+                                                    echo "<td> <select name='section_user' >";
+                                                    
+                                                    while ($ftd1 = mysqli_fetch_array($ret_user)) {
+                                                        echo "<option  value=" . $ftd1['aid'] . ">" . $ftd1['username'] . "</option>";
+                                                    } ?>
+                                                        </select> </td>
+                                                                
+                                                    <td>
+                                                        <button class='btn' name='send_app' title='Send'>
+                                                        <i class='zmdi zmdi-mail-send'></i>
+                                                        </button>
+                                                    </td>
+                                                    <input type="hidden" id="application" value=<?php echo $ftd['application_id'];?> name="application" >
+                                                    <input type="text" id="comments" value="" name="comments" require>
+                                                </form>
+                                                <?php }
+                                                else if ($user_type==2){ ?>
+                                                <form action="" method="post">
+                                                <td>
+                                                <input type="text" id="comments" value="" name="comments" require>
+                                                <input type="hidden" id="application" value=<?php echo $ftd['application_id'];?> name="application" >
+
+                                                </td>
+                                                <td>
+                                                <select name='section_user' >
+                                                    <option value=3>Approve</option>
+                                                    <option value=4>Reject</option>
+                                                    <option value=5>Send To</option>
+                                                </select> 
+                                                <td>
+                                                        <button class='btn' name='send_app' title='Send'>
+                                                        <i class='zmdi zmdi-mail-send'></i>
+                                                        </button>
+                                                    </td>
+                                                    <!-- <button class='btn btn-primary' name='send_app' title='Send'>
+                                                        Approve
+                                                        </button>
+                                                        <button class='btn btn-danger' name='send_app' title='Send'>
+                                                        Reject
+                                                        </button> -->
+                                                    </td>
+                                                </form>
+
+                                               <?php }
+                                                ?>
+                                                    <tr class='spacer'></tr>
+                                                <?php }  ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                </form>
+                                <!-- END DATA TABLE -->
+                                              
+                            </div>
+                        </div>
+                      
+                        </div>
+                        </div>
+                        <?php
+                        include_once("footer.php");
+                          }
+                        ?>
+                        
+                        
