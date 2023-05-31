@@ -7,20 +7,28 @@ if (strlen($_SESSION['id'] == 0)) {
   include_once("head.php");
   $section=$_SESSION['id'];
   $user_type=$_SESSION['user_type'];
+  $user_id = $_SESSION['user_id'];
 
   if ($_SESSION['id']==1 | $_SESSION['id']==3  ) {
     $sql = "SELECT application_id,subject,section_id,ref_date,reference_no,current_state,receive_from,`trans_dep`.`section`,date_of_received FROM trans_section 
     INNER join 	`trans_dep` ON `trans_dep`.`unique_id` = `trans_section`.`section_id`
     where current_state in (1,4);";
   }
+  else if ($user_type=2){
+    
+    $sql = "SELECT application_id,subject,section_id,ref_date,reference_no,current_state,receive_from,`trans_dep`.`section`,date_of_received  FROM trans_section
+    INNER join 	`trans_dep` ON `trans_dep`.`unique_id` = `trans_section`.`section_id` 
+    where  current_state =2 AND current_position= $user_id";
+  }
   else {
     $sql = "SELECT application_id,subject,section_id,ref_date,reference_no,current_state,receive_from,`trans_dep`.`section`,date_of_received  FROM trans_section
     INNER join 	`trans_dep` ON `trans_dep`.`unique_id` = `trans_section`.`section_id` 
-    where section_id=$section and current_state=$user_type and current_state in (1,4)";
+    where section_id=$section  and current_state in (1,4)";
     if ($user_type==1){
         $sql_user = "SELECT * FROM `trans_user` where `pcId` =$section and user_type=2";     
     }
   } 
+
     $ret1= mysqli_query($con,$sql);
 
 // function
@@ -58,7 +66,6 @@ if(isset($_POST['send_app'])){
         $current_state=$_POST['current_state'];
     }
     $sec_user=$_POST['section_user'];
-    
     $application_no = $_POST['application'];
     $comments=$_POST['comments'];
     $sqll="UPDATE `trans_section` SET `current_state` = $current_state WHERE `application_id` = '$application_no' ";
@@ -71,7 +78,7 @@ if(isset($_POST['send_app'])){
          echo "<script type='text/javascript'> document.location = 'table.php'; </script>";
       }
     }else{
-        echo "<script>alert('Error updating record $current_state $application_no $sqll');</script>";
+        echo "<script>alert('Error updating record ');</script> ";
 
     }
        

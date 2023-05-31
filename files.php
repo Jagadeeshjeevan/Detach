@@ -8,46 +8,44 @@ if (strlen($_SESSION['id'] == 0)) {
   $section=$_SESSION['id'];
   $user_type=$_SESSION['user_type'];
   if ($_SESSION['id']==1 | $_SESSION['id']==3  ) {
-    $sql = "SELECT application_id,subject,section_id,ref_date,reference_no,current_state FROM trans_section where current_state not in (1,4)";
+    $sql = "SELECT application_id,subject,section_id,ref_date,reference_no,current_state,receive_from,`trans_dep`.`section`,date_of_received FROM trans_section 
+    INNER join 	`trans_dep` ON `trans_dep`.`unique_id` = `trans_section`.`section_id`
+    where current_state not in (1,4);";
   }
   else {
-    $sql = "SELECT application_id,subject,section_id,ref_date,reference_no,current_state FROM trans_section where section_id=$section and current_state not in (1,4)";
+    $sql = "SELECT application_id,subject,section_id,ref_date,reference_no,current_state,receive_from,`trans_dep`.`section`,date_of_received  FROM trans_section
+    INNER join 	`trans_dep` ON `trans_dep`.`unique_id` = `trans_section`.`section_id` 
+    where section_id=$section and current_position=$user_type and current_state not in (1,4)";
     if ($user_type==1){
-        $sql_user = "SELECT * FROM `trans_user` where `pcId` =$section and user_type=2";
-        $ret_user= mysqli_query($con,$sql_user);
+        $sql_user = "SELECT * FROM `trans_user` where `pcId` =$section and user_type=2";     
     }
 } 
     $ret1= mysqli_query($con,$sql);
-
-    /// Submit Filed test value 
-if(isset($_POST['send_app'])){
-
-    if (  $user_type==1){
-        $current_state = 2;
-    }
-    else{
-        $current_state=$_POST['current_state'];
-    }
-    $sec_user=$_POST['section_user'];
     
-    $application_no = $_POST['application'];
-    $comments=$_POST['comments'];
-    $sqll="UPDATE `trans_section` SET `current_state` = $current_state WHERE `application_id` = $application_no";
-    if (mysqli_query($con, $sqll)) {
-    $sql="INSERT INTO `trans_application`(`application_id`, `send_to`, `comments`) VALUES ('$application_no','$sec_user','$comments')";  
-    $msg=mysqli_query($con,$sql);
-    if($msg)
-     {
-      echo "<script>alert('User Added successfully');</script>";
-         echo "<script type='text/javascript'> document.location = 'table.php'; </script>";
-      }
-    }else{
-        echo "<script>alert('Error updating record $current_state $sec_user');</script>";
-
-    }
-
+// function
+function statusColor($statusColor){
+    $secStatus = "";
+    $secColor = "";
+    switch ($statusColor) {
+        case 1:
+          $secStatus = "Created";
+          $secColor = "status--process";
+          break;
+        case 2:
+          $secStatus = "Assigned";
+          $secColor = "";
+          break;
+        case 3:
+          $secStatus = "Approved";
+          $secColor = "";
+          break;
+        case 4:
+          $secStatus = "Return";
+          $secColor = "status--denied";
+          break;
+        }
+    return [$secStatus,$secColor];
 }
-    
 ?>
 
             <!-- MAIN CONTENT-->
@@ -66,9 +64,10 @@ if(isset($_POST['send_app'])){
                                             <tr>
                                                 <th>Reference ID</th>
                                                 <th>Application No</th>
-                                                <th>Dated</th>
+                                                <th>Date of Entry</th>
+                                                <th>Applicatio Date</th>
                                                 <th>Subject</th>
-                                                <th>Period</th>
+                                                <th>Received from</th>
                                                 <th>Section</th>
                                                 <th>Status</th>
                                             </tr>
@@ -79,12 +78,17 @@ if(isset($_POST['send_app'])){
                                                 while ($ftd = mysqli_fetch_array($ret1)) {
                                                 echo "<tr class='tr-shadow'>";
                                                 echo "<td>".$ftd['reference_no']."</td>"; 
-                                                    echo "<td>".$ftd['application_id']."</td>";
-                                                    echo "<td>".$ftd['ref_date']."</td>";  
-                                                    echo "<td  class='status--process'>".$ftd['subject']."</td>";  
-                                                    echo "<td>Hello</td>"; 
-                                                    echo "<td>".$ftd['section_id']."</td>"; 
-                                                    echo "<td>".$ftd['current_state']."</td>"; 
+                                                echo "<td>".$ftd['application_id']."</td>";
+                                                $dt = new DateTime($ftd['ref_date']);
+                                                $dt2 = new DateTime($ftd['date_of_received']);
+                                                echo "<td>".$dt->format('Y-m-d')."</td>";  
+                                                echo "<td>".$dt2->format('Y-m-d')."</td>";  
+                                                echo "<td>".$ftd['subject']."</td>";  
+                                                echo "<td>".$ftd['receive_from']."</td>"; 
+                                                echo "<td>".$ftd['section']."</td>"; 
+                                                $sectionFeature = statusColor($ftd['current_state']);
+                                                echo "<td> <span class=".$sectionFeature[1].">".$sectionFeature[0]."</span></td>"; 
+                                             ?>
                                                 
                                                 ?>
                                                     <tr class='spacer'></tr>
