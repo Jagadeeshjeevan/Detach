@@ -84,10 +84,6 @@ include_once('includes/config.php');
                             <a href="add_user.php">
                                 <i class="fas fa-desktop"></i>Add User</a>
                         </li>
-                        <li>
-                            <a href="list_user.php">
-                                <i class="fas fa-desktop"></i>List User</a>
-                        </li>
                         <?php } ?>
                     </ul>
                 </div>
@@ -99,7 +95,7 @@ include_once('includes/config.php');
         <aside class="menu-sidebar d-none d-lg-block">
             <div class="logo">
                 <a href="#">
-                    <h3>FIle Tracking System</h3>
+                    <h3>File Tracking System</h3>
                 </a>
             </div>
             <div class="menu-sidebar__content js-scrollbar1">
@@ -126,7 +122,7 @@ include_once('includes/config.php');
                                 <i class="fas fa-table"></i>Tapls</a>
                         </li>
                         <li>
-                            <a href="tapls.php">
+                            <a href="files.php">
                                 <i class="fas fa-table"></i>Files</a>
                         </li>
                         <?php
@@ -135,10 +131,6 @@ include_once('includes/config.php');
                         <li>
                             <a href="add_user.php">
                                 <i class="fas fa-desktop"></i>Add User</a>
-                        </li>
-                        <li>
-                                <a href="list_user.php">
-                                <i class="fas fa-calendar-alt"></i>List User</a>
                         </li>
                         <?php } ?>
                     </ul>

@@ -12,11 +12,12 @@ if (strlen($_SESSION['id'] == 0)) {
         $subject=$_POST['subject']; 
         $dor=$_POST['dor']; 
         $section=$_POST['section']; 
-    $sql="INSERT INTO `trans_section`(`application_id`, `subject`, `date_of_received`,`period`,`section_id`,`reference_no`)  VALUES ('$reference_id','$subject', '$dor',1,'$section','$unique')";  
+        $received_from = $_POST['received_from']; 
+    $sql="INSERT INTO `trans_section`(`application_id`, `subject`, `date_of_received`,`period`,`section_id`,`reference_no`,`receive_from`)  VALUES ('$reference_id','$subject', '$dor',1,'$section','$unique', '$received_from')";  
     $msg=mysqli_query($con,$sql);
     if($msg)
      {
-      echo "<script>alert('Profile updated successfully');</script>";
+      echo "<script>alert('Profile updated successfully' );</script>";
          echo "<script type='text/javascript'> document.location = 'form.php'; </script>";
       }
     }
@@ -39,7 +40,7 @@ if (strlen($_SESSION['id'] == 0)) {
                                                     <label for="text-input" class=" form-control-label" >Application Number</label>
                                                 </div>
                                                 <div class="col-12 col-md-3">
-                                                    <input type="text" id="text-input" name="reference_id" placeholder="Refernce ID" class="form-control">
+                                                    <input type="text" id="text-input" name="reference_id" placeholder="Refernce ID" class="form-control"  required>
                                                 </div>
                                             </div>
                                             <div class="row form-group">
@@ -47,7 +48,7 @@ if (strlen($_SESSION['id'] == 0)) {
                                                     <label for="text-input" class=" form-control-label">Subject</label>
                                                 </div>
                                                 <div class="col-12 col-md-9">
-                                                    <input type="text" id="text-input" name="subject" placeholder="Subject" class="form-control">
+                                                    <input type="text" id="text-input" name="subject" placeholder="Subject" class="form-control" required>
                                                 </div>
                                             </div>
 
@@ -56,12 +57,23 @@ if (strlen($_SESSION['id'] == 0)) {
                                                     <label for="text-input" class=" form-control-label">Date of Reciept</label>
                                                 </div>
                                                 <div class="col-6 col-md-3">
-                                                    <input id="cc-exp" name="dor" type="tel" class="form-control cc-exp" value="" data-val="true" data-val-required="Please enter the card expiration"
-                                                            data-val-cc-exp="Please enter a valid month and year" placeholder="MM / YY"
-                                                            autocomplete="cc-exp">    
+                                                    <input id="cc-exp" name="dor" type="date" class="form-control cc-exp" required>    
                                                 </div>
                                             </div>
-                                    
+                                            <div class="row form-group">
+                                                <div class="col col-md-3">
+                                                    <label for="select" class=" form-control-label">Received from</label>
+                                                </div>
+                                                <div class="col-12 col-md-3">
+                                                    <select name="received_from" id="received_from" class="form-control" required>
+                                                            <?php
+                                                            $query_rf = mysqli_query($con, "SELECT `name` FROM `ma_receive_from` where status = 1;");
+                                                            while ($result = mysqli_fetch_array($query_rf))
+                                                            echo '<option value="' . $result["name"] . '">' . $result['name'] . '</option>';
+                                                            ?>
+                                                        </select>
+                                                </div>
+                                            </div>            
                                             <div class="row form-group">
                                                 <div class="col col-md-3">
                                                     <label for="select" class=" form-control-label">Section</label>

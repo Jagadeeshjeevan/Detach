@@ -10,12 +10,12 @@ if (strlen($_SESSION['id']==0)) {
     $n_sec_sql ="SELECT count(*) count,`current_state` FROM `trans_section` where section_id='7788' GROUP BY `current_state`;";
     $me_sec_sql="SELECT count(*) count,`current_state` FROM `trans_section` where section_id='2233' GROUP BY `current_state`;";
     $t_sec_sql = "SELECT count(*) count,`current_state` FROM `trans_section` where section_id='8866' GROUP BY `current_state`;";
-    $total_sql     = "SELECT count(*)count,`current_state` FROM `trans_section`  GROUP BY `current_state`;";
+    $e_sec_sql = "SELECT count(*) count,`current_state` FROM `trans_section` where section_id='4455' GROUP BY `current_state`;";
     
     $ret_n_dashboard= mysqli_query($con,$n_sec_sql);
     $ret_me_dashboard= mysqli_query($con,$me_sec_sql);
     $ret_t_dashboard= mysqli_query($con,$t_sec_sql);
-    $total_dashboard= mysqli_query($con,$total_sql);
+    $ret_e_dashboard= mysqli_query($con,$e_sec_sql);
 
 
     function dashboard($dashboard){
@@ -23,14 +23,11 @@ if (strlen($_SESSION['id']==0)) {
         $rejected=0;
         $pending=0;
         while ($ftd = mysqli_fetch_array($dashboard)) {
-            if(in_array($ftd['current_state'],array(0,1,3 ) )) {
+            if(in_array($ftd['current_state'],array(1,2,4 ) )) {
                 $pending+=$ftd['count'];
             }
-            if($ftd['current_state'] == 4  ){
+            if($ftd['current_state'] == 3  ){
                 $rejected=$ftd['count'];
-            }
-            if($ftd['current_state'] == '3'  ){
-                $approved=$ftd['count'];
             }
         }
         
@@ -92,7 +89,7 @@ if (strlen($_SESSION['id']==0)) {
                                     <div class="overview__inner">
                                         <div class="overview-box clearfix">
                                             <div class="text">
-                                                <h2>T sections</h2>
+                                                <h2>T Section</h2>
                                                 <?php
                                             dashboard($ret_t_dashboard);
                                                 ?>
@@ -106,9 +103,9 @@ if (strlen($_SESSION['id']==0)) {
                                     <div class="overview__inner">
                                         <div class="overview-box clearfix">
                                             <div class="text">
-                                                <h2>Total Sections</h2>
+                                                <h2>E Section</h2>
                                                 <?php
-                                            dashboard($total_dashboard);
+                                            dashboard($ret_e_dashboard);
                                                 ?>
                                             </div>
                                         </div>  
