@@ -99,7 +99,7 @@ include_once('includes/config.php');
         <aside class="menu-sidebar d-none d-lg-block">
             <div class="logo">
                 <a href="#">
-                    <img src="images/icon/logo.png" alt="Cool Admin" />
+                    <h3>FIle Tracking System</h3>
                 </a>
             </div>
             <div class="menu-sidebar__content js-scrollbar1">
@@ -112,6 +112,10 @@ include_once('includes/config.php');
                             <a href="index.php">
                                 <i class="fas fa-tachometer-alt"></i>Dashboard</a>
                         </li>
+                        <?php } ?>
+                        <?php
+                        if ($_SESSION['id']==3) {
+                            ?>
                         <li>
                             <a href="form.php">
                                 <i class="far fa-check-square"></i>Add Application</a>
@@ -119,7 +123,11 @@ include_once('includes/config.php');
                         <?php } ?>
                         <li>
                             <a href="table.php">
-                                <i class="fas fa-table"></i>List Application</a>
+                                <i class="fas fa-table"></i>Tapls</a>
+                        </li>
+                        <li>
+                            <a href="tapls.php">
+                                <i class="fas fa-table"></i>Files</a>
                         </li>
                         <?php
                         if ($_SESSION['id']==1) {

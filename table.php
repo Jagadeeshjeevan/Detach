@@ -7,11 +7,11 @@ if (strlen($_SESSION['id'] == 0)) {
   include_once("head.php");
   $section=$_SESSION['id'];
   $user_type=$_SESSION['user_type'];
-  if ($_SESSION['id']==1) {
-    $sql = "SELECT application_id,subject,section_id,ref_date,reference_no FROM trans_section";
+  if ($_SESSION['id']==1 | $_SESSION['id']==3  ) {
+    $sql = "SELECT application_id,subject,section_id,ref_date,reference_no,current_state FROM trans_section where current_state in (1,4)";
   }
   else {
-    $sql = "SELECT application_id,subject,section_id,ref_date,reference_no FROM trans_section where section_id=$section and current_state=$user_type";
+    $sql = "SELECT application_id,subject,section_id,ref_date,reference_no FROM trans_section where section_id=$section and current_state=$user_type and current_state in (1,4)";
     if ($user_type==1){
         $sql_user = "SELECT * FROM `trans_user` where `pcId` =$section and user_type=2";
         $ret_user= mysqli_query($con,$sql_user);
@@ -21,13 +21,31 @@ if (strlen($_SESSION['id'] == 0)) {
 
     /// Submit Filed test value 
 if(isset($_POST['send_app'])){
+
+    if (  $user_type==1){
+        $current_state = 2;
+    }
+    else{
+        $current_state=$_POST['current_state'];
+    }
     $sec_user=$_POST['section_user'];
+    
     $application_no = $_POST['application'];
+    $comments=$_POST['comments'];
+    $sqll="UPDATE `trans_section` SET `current_state` = $current_state WHERE `application_id` = $application_no";
+    if (mysqli_query($con, $sqll)) {
+    $sql="INSERT INTO `trans_application`(`application_id`, `send_to`, `comments`) VALUES ('$application_no','$sec_user','$comments')";  
+    $msg=mysqli_query($con,$sql);
+    if($msg)
+     {
+      echo "<script>alert('User Added successfully');</script>";
+         echo "<script type='text/javascript'> document.location = 'table.php'; </script>";
+      }
+    }else{
+        echo "<script>alert('Error updating record $current_state $sec_user');</script>";
 
+    }
 
-
-
-    echo "<script>alert('Inserted Field successfully $sec_user - $application_no');</script>";
 }
     
 ?>
@@ -51,24 +69,35 @@ if(isset($_POST['send_app'])){
                                                 <th>Dated</th>
                                                 <th>Subject</th>
                                                 <th>Period</th>
-                                                <th>Pending with</th>
                                                 <?php
                                                 if (  $user_type==1){
                                                 echo "<th> Assign to <th>";
-                                                }?>
+                                                }
+                                                else if (  $user_type==2){
+                                                   echo  "<th>Comments</th>";
+                                                }
+                                                else{
+                                                    echo  "<th>Section</th>";
+                                                    echo  "<th>Status</th>";
+                                                    
+                                                }
+                                                ?>
                                             </tr>
                                         </thead>
                                         <tbody>
+                                        <form action="" method="post">
                                         <?php 
                                                 while ($ftd = mysqli_fetch_array($ret1)) {
                                                 echo "<tr class='tr-shadow'>";
-                                                    echo "<td name='application' id='application' value=".$ftd['application_id'].">".$ftd['application_id']."</td>";  
-                                                    echo "<td>".$ftd['reference_no']."</td>";  
+                                                echo "<td>".$ftd['reference_no']."</td>"; 
+                                                    echo "<td>".$ftd['application_id']."</td>";
                                                     echo "<td>".$ftd['ref_date']."</td>";  
                                                     echo "<td  class='status--process'>".$ftd['subject']."</td>";  
-                                                    echo "<td>Hello</td>";  
-                                                    echo "<td>Hello</td>"; 
+                                                    echo "<td>Hello</td>"; ?>
+                                                    
+                                                    <?php
                                                     if (  $user_type==1){
+                                                        
                                                     echo "<td> <select name='section_user' >";
                                                     
                                                     while ($ftd1 = mysqli_fetch_array($ret_user)) {
@@ -81,19 +110,34 @@ if(isset($_POST['send_app'])){
                                                         <i class='zmdi zmdi-mail-send'></i>
                                                         </button>
                                                     </td>
+                                                    <input type="hidden" id="application" value=<?php echo $ftd['application_id'];?> name="application" >
+                                                    <input type="text" id="comments" value="" name="comments" require>
+                                                </form>
                                                 <?php }
                                                 else if ($user_type==2){ ?>
-                                                    <td>
-                                                    
-                                                    <button class='btn btn-primary' name='send_app' title='Send'>
-                                                        Approve
-                                                        </button>
-                                                        <button class='btn btn-danger' name='send_app' title='Send'>
-                                                        Reject
+                                                <form action="" method="post">
+                                                <td>
+                                                <input type="text" id="comments" value="" name="comments" require>
+                                                <input type="hidden" id="application" value=<?php echo $ftd['application_id'];?> name="application" >
+
+                                                </td>
+                                                <td>
+                                                <select name='current_state' >
+                                                    <option value=3>Approve</option>
+                                                    <option value=4>Send Back</option>
+                                                </select> 
+                                                <td>
+                                                        <button class='btn' name='send_app' title='Send'>
+                                                        <i class='zmdi zmdi-mail-send'></i>
                                                         </button>
                                                     </td>
-
+                                                    </td>
+                                                </form>
                                                <?php }
+                                                 else{
+                                                    echo "<td>".$ftd['section_id']."</td>"; 
+                                                    echo "<td>".$ftd['current_state']."</td>"; 
+                                                 }
                                                 ?>
                                                     <tr class='spacer'></tr>
                                                 <?php }  ?>
